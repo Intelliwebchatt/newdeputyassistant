@@ -11,63 +11,78 @@ body {
 
 .container {
   text-align: center;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(15px);
+  padding: 25px;
+  border-radius: 15px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
   width: 90%;
-  max-width: 400px;
+  max-width: 450px;
 }
 
 h1 {
-  font-size: 2em;
+  font-size: 2.2em;
   color: #ffcc00;
+  text-shadow: 2px 2px 10px rgba(255, 204, 0, 0.6);
 }
 
 .input-group {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-bottom: 15px;
+  gap: 12px;
+  margin-bottom: 20px;
 }
 
 input[type="text"] {
-  padding: 12px;
+  padding: 14px;
   width: 100%;
   border: none;
-  border-radius: 6px;
-  font-size: 1em;
+  border-radius: 8px;
+  font-size: 1.1em;
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  outline: none;
+}
+
+input[type="text"]::placeholder {
+  color: rgba(255, 255, 255, 0.6);
 }
 
 button {
-  padding: 12px;
-  font-size: 1em;
+  padding: 14px;
+  font-size: 1.1em;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: background 0.3s ease;
+  transition: background 0.3s ease, transform 0.2s;
 }
 
 #submit {
   background: #ffcc00;
   color: #000;
+  font-weight: bold;
 }
 
 #submit:hover {
   background: #ffaa00;
+  transform: scale(1.05);
 }
 
 #clear {
   background: #ff4444;
   color: #fff;
+  font-weight: bold;
 }
 
 #clear:hover {
   background: #cc0000;
+  transform: scale(1.05);
 }
 
 #response {
-  margin-top: 20px;
-  font-size: 1.2em;
+  margin-top: 25px;
+  font-size: 1.3em;
+  font-weight: bold;
+  color: #ffcc00;
+  text-shadow: 1px 1px 10px rgba(255, 204, 0, 0.6);
 }
