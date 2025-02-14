@@ -1,6 +1,8 @@
 const axios = require('axios');
 
 exports.handler = async function(event, context) {
+  console.log('Received event:', event);
+
   if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,
@@ -9,6 +11,7 @@ exports.handler = async function(event, context) {
   }
 
   const { question } = JSON.parse(event.body);
+  console.log('User question:', question);
 
   if (!question) {
     return {
@@ -19,6 +22,7 @@ exports.handler = async function(event, context) {
 
   const openaiApiKey = process.env.OPENAI_API_KEY;
   if (!openaiApiKey) {
+    console.error('Missing OpenAI API Key in environment variables');
     return {
       statusCode: 500,
       body: JSON.stringify({ error: 'Missing OpenAI API Key' })
@@ -26,6 +30,7 @@ exports.handler = async function(event, context) {
   }
 
   try {
+    console.log('Sending request to OpenAI API...');
     const response = await axios.post('https://api.openai.com/v1/chat/completions', {
       model: 'gpt-4o',
       messages: [{ role: 'user', content: question }]
@@ -35,6 +40,8 @@ exports.handler = async function(event, context) {
         'Content-Type': 'application/json'
       }
     });
+
+    console.log('OpenAI Response:', response.data);
 
     if (!response.data || !response.data.choices || response.data.choices.length === 0) {
       throw new Error('Invalid response from OpenAI');
