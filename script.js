@@ -6,7 +6,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (submitButton && clearButton && questionInput && responseDiv) {
     submitButton.addEventListener('click', async () => {
-      const question = questionInput.value;
+      const question = questionInput.value.trim();
+      console.log('Submit button clicked.'); // Log button click
       console.log('Question:', question); // Log the question
 
       if (!question) {
@@ -25,9 +26,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         console.log('Request sent. Awaiting response...');
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+
         const data = await response.json();
         console.log('Response received:', data); // Log the response
-        responseDiv.innerText = data.answer;
+        responseDiv.innerText = data.answer || 'No answer received.';
       } catch (error) {
         console.error('Error occurred:', error); // Log any errors
         responseDiv.innerText = 'Error: ' + error.message;
