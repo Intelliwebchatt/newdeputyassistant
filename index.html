@@ -1,61 +1,13 @@
-const axios = require('axios');
-
-exports.handler = async function(event, context) {
-  console.log('Received event:', event);
-
-  if (event.httpMethod !== 'POST') {
-    return {
-      statusCode: 405,
-      body: JSON.stringify({ error: 'Method Not Allowed' })
-    };
-  }
-
-  const { question } = JSON.parse(event.body);
-  console.log('User question:', question);
-
-  if (!question) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ error: 'Question is required' })
-    };
-  }
-
-  const openaiApiKey = process.env.OPENAI_API_KEY;
-  if (!openaiApiKey) {
-    console.error('Missing OpenAI API Key in environment variables');
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: 'Missing OpenAI API Key' })
-    };
-  }
-
-  try {
-    console.log('Sending request to OpenAI API...');
-    const response = await axios.post('https://api.openai.com/v1/chat/completions', {
-      model: 'gpt-4o',
-      messages: [{ role: 'user', content: question }]
-    }, {
-      headers: {
-        'Authorization': `Bearer ${openaiApiKey}`,
-        'Content-Type': 'application/json'
-      }
-    });
-
-    console.log('OpenAI Response:', response.data);
-
-    if (!response.data || !response.data.choices || response.data.choices.length === 0) {
-      throw new Error('Invalid response from OpenAI');
-    }
-
-    return {
-      statusCode: 200,
-      body: JSON.stringify({ answer: response.data.choices[0].message.content })
-    };
-  } catch (error) {
-    console.error('OpenAI API Error:', error.response ? error.response.data : error.message);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: 'OpenAI API request failed', details: error.message })
-    };
-  }
-};
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deputy Assistant</title>
+  <link rel="stylesheet" href="/src/index.css">
+</head>
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.jsx"></script>
+</body>
+</html>
