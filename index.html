@@ -1,44 +1,54 @@
-document.addEventListener('DOMContentLoaded', () => {
-  const submitButton = document.getElementById('submit');
-  const clearButton = document.getElementById('clear');
-  const questionInput = document.getElementById('question');
-  const responseDiv = document.getElementById('response');
+const axios = require('axios');
 
-  if (!submitButton || !clearButton || !questionInput || !responseDiv) {
-    console.error('One or more elements are missing from the DOM. Check your index.html file.');
-    return;
+exports.handler = async function(event, context) {
+  if (event.httpMethod !== 'POST') {
+    return {
+      statusCode: 405,
+      body: JSON.stringify({ error: 'Method Not Allowed' })
+    };
   }
 
-  submitButton.addEventListener('click', async () => {
-    const question = questionInput.value.trim();
-    if (!question) {
-      alert('Please enter a question.');
-      return;
-    }
-    
-    responseDiv.innerText = 'Thinking...';
-    
-    try {
-      const response = await fetch('/.netlify/functions/ask', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question })
-      });
+  const { question } = JSON.parse(event.body);
 
-      if (!response.ok) {
-        throw new Error(`Network response was not ok: ${response.statusText}`);
+  if (!question) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: 'Question is required' })
+    };
+  }
+
+  const openaiApiKey = process.env.OPENAI_API_KEY;
+  if (!openaiApiKey) {
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: 'Missing OpenAI API Key' })
+    };
+  }
+
+  try {
+    const response = await axios.post('https://api.openai.com/v1/chat/completions', {
+      model: 'gpt-4o',
+      messages: [{ role: 'user', content: question }]
+    }, {
+      headers: {
+        'Authorization': `Bearer ${openaiApiKey}`,
+        'Content-Type': 'application/json'
       }
+    });
 
-      const data = await response.json();
-      responseDiv.innerText = data.answer || 'No answer received.';
-    } catch (error) {
-      console.error('Error occurred:', error);
-      responseDiv.innerText = `Error: ${error.message}`;
+    if (!response.data || !response.data.choices || response.data.choices.length === 0) {
+      throw new Error('Invalid response from OpenAI');
     }
-  });
 
-  clearButton.addEventListener('click', () => {
-    questionInput.value = '';
-    responseDiv.innerText = '';
-  });
-});
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ answer: response.data.choices[0].message.content })
+    };
+  } catch (error) {
+    console.error('OpenAI API Error:', error.response ? error.response.data : error.message);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: 'OpenAI API request failed', details: error.message })
+    };
+  }
+};
